@@ -6,7 +6,6 @@
  */
 
 import react = require('react');
-
 import endpoints = require('./endpoints');
 import utils = require('./utils');
 import apicalls = require('./apicalls');
@@ -23,7 +22,7 @@ interface FileElement extends HTMLElement {
 const ce = react.createElement;
 const  d = react.DOM;
 
-const developerPage = 'https://www.dropbox.com/developers-preview';
+const developerPage = 'https://www.rinocloud.com/documentation';
 
 /* Element for text field in page table.
  */
@@ -48,6 +47,9 @@ class TokenInput extends react.Component<TokenInputProps, void> {
 
     // This function handles the initial part of the OAuth2 token flow for the user.
     retrieveAuth = () => {
+        var win = window.open('http://localhost:8000/api/1/users/token/', '_blank');
+        win.focus();
+
         const state = utils.getHashDict()['__ept__'] + '!' + utils.createCsrfToken();
         const params: utils.Dict = {
             response_type: 'token',
@@ -59,7 +61,7 @@ class TokenInput extends react.Component<TokenInputProps, void> {
         for (let key in params) {
             urlWithParams += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]) + '&';
         }
-        window.location.assign(urlWithParams);
+        // window.location.assign(urlWithParams);
     }
     public render() {
         return d.tr(null,
@@ -254,6 +256,35 @@ class RequestArea extends react.Component<RequestAreaProps, any> {
         }
         this.setState({__file__: null, errMsg:null});
     }
+
+    componentDidMount = () => {
+      let ta = document.getElementsByTagName("textarea")[0]
+      var cm = CodeMirror.fromTextArea(ta, {lineNumbers: true, mode: "javascript"})
+      cm.on('change', function(){
+        cm.save()
+        const v = cm.getDoc().getValue();
+        try{
+          this.updateParamValues('json', JSON.parse(v))
+        }
+        catch (Exception){
+          return ''
+        }
+      }.bind(this))
+    }
+
+    stringify = () => {
+      return JSON.stringify(this.flatten());
+    }
+
+    flatten = () => {
+      let obj = JSON.parse(JSON.stringify(this.state.paramVals))
+      if (this.state.paramVals.hasOwnProperty('json')) {
+        for (var attrname in this.state.paramVals.json) { obj[attrname] = this.state.paramVals.json[attrname]; }
+        delete obj.json;
+      }
+      return obj;
+    }
+
     /* Submits a call to the API. This function handles the display logic (e.g. whether or not to
        display an error message for a missing token), and the APICaller prop actually sends the
        request.
@@ -268,7 +299,7 @@ class RequestArea extends react.Component<RequestAreaProps, any> {
             this.setState({errMsg: null});
             const responseFn = apicalls.chooseCallback(this.props.currEpt.kind,
                 utils.getDownloadName(this.props.currEpt, this.state.paramVals));
-            this.props.APICaller(JSON.stringify(this.state.paramVals), this.props.currEpt,
+            this.props.APICaller(this.stringify(), this.props.currEpt,
                                 token, responseFn, this.state.__file__);
         }
     }
@@ -329,7 +360,7 @@ class RequestArea extends react.Component<RequestAreaProps, any> {
                             d.div({id: 'request-container'},
                                 ce(CodeArea, {
                                     ept:       this.props.currEpt,
-                                    paramVals: this.state.paramVals,
+                                    paramVals: this.flatten(),
                                     __file__:  this.state.__file__,
                                     token:     this.state.showToken? utils.getToken() : '<access-token>'
                                 })
@@ -392,8 +423,8 @@ class EndpointSelector extends react.Component<EndpointSelectorProps, void> {
             d.p({style: {marginLeft: '35px', marginTop: '12px'}},
                 d.a({onClick: () => window.location.href = developerPage},
                     d.img({
-                        src:       'https://cf.dropboxstatic.com/static/images/icons/blue_dropbox_glyph-vflJ8-C5d.png',
-                        width:     36,
+                        src:       'https://s3-eu-west-1.amazonaws.com/rinocloud/static/logo.png',
+                        width:     100,
                         className: 'home-icon'
                     })
                 )
@@ -494,7 +525,7 @@ class APIExplorer extends react.Component<APIExplorerProps, any> {
 
         return ce(MainPage, {
             currEpt:  this.state.ept,
-            header:   <react.ReactNode>d.span(null, 'Dropbox API Explorer • ' + this.state.ept.name),
+            header:   <react.ReactNode>d.span(null, 'Rinocloud API Explorer • ' + this.state.ept.name),
             messages: [
                 ce(RequestArea, {
                     currEpt:    this.state.ept,
@@ -548,7 +579,7 @@ class TextPage extends react.Component<TextPageProps, void> {
     public render() {
         return ce(MainPage, {
             currEpt:  new utils.Endpoint('', '', null),
-            header:   d.span(null, 'Dropbox API Explorer'),
+            header:   d.span(null, 'Rinocloud API Explorer'),
             messages: [this.props.message]
         })
     }
@@ -558,10 +589,10 @@ class TextPage extends react.Component<TextPageProps, void> {
 const introPage: react.ReactElement<TextPageProps> = ce(TextPage, {
         message:
             d.span(null,
-                d.p(null, 'Welcome to the Dropbox API Explorer!'),
+                d.p(null, 'Welcome to the Rinocloud API Explorer!'),
                 d.p(null,
                     'This API Explorer is a tool to help you learn about the ',
-                    d.a({href: developerPage}, 'Dropbox API v2'),
+                    d.a({href: developerPage}, 'Rinocloud API v2'),
                     " and test your own examples. For each endpoint, you'll be able to submit an API call ",
                     'with your own parameters and see the code for that call, as well as the API response.'
                 ),
@@ -581,7 +612,7 @@ const introPage: react.ReactElement<TextPageProps> = ce(TextPage, {
 const endpointNotFound: react.ReactElement<TextPageProps> = ce(TextPage, {
         message:
             d.span(null,
-                d.p(null, 'Welcome to the Dropbox API Explorer!'),
+                d.p(null, 'Welcome to the Rinocloud API Explorer!'),
                 d.p(null,
                     "Unfortunately, there doesn't seem to be an endpoint called ",
                     d.b(null, window.location.hash.substr(1)),

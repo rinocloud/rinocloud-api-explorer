@@ -13,13 +13,22 @@ button,
     font-weight: normal;
 }
 
-input {
+textarea, input {
     height: 28px;
     border-radius: 3px;
     box-shadow: 0px 3px 3px #eee;
     border: 1px solid #bfbfbf;
     color: #444;
     padding: 4px;
+}
+
+textarea, .Codemirror {
+    width: 400px;
+    height: 150px;
+}
+
+.Codemirror pre {
+  float: none;
 }
 
 input, select {

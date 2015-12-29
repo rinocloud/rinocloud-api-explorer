@@ -14,6 +14,8 @@ import react = require('react');
 import hljs = require('highlight.js');
 import cookie = require('./cookie');
 
+export const host = 'localhost:8000'
+
 type MappingFn = (key: string, value: any, i: number) => react.ClassicElement<{}>;
 
 const ce = react.createElement;
@@ -22,7 +24,7 @@ const d = react.DOM;
 // This class mostly exists to help Typescript type-check my programs.
 export class Dict {
     [index: string]: any;
-    
+
     /* Two methods for mapping through dictionaries, customized to the API Explorer's use case.
        - _map takes function from a key, a value, and an index to a React element, and
        - map is the same, but without an index.
@@ -102,11 +104,9 @@ export class Endpoint {
         this.params = params;
     }
 
-    getHostname = (): string => (this.kind !== EndpointKind.RPCLike)?
-        'content.dropboxapi.com' : 'api.dropboxapi.com';
-
-    getPathname = (): string => '/2-beta-2/' + this.ns + '/' + this.name;
-    getURL = (): string => 'https://' + this.getHostname() + this.getPathname();
+    getHostname = () => host + '/api/1/';
+    getPathname = (): string => '' + this.ns + '/' + this.name;
+    getURL = (): string => 'http://' + this.getHostname() + this.getPathname() + '/';
 }
 
 /* A parameter to an API endpoint. This class is abstract, as different kinds of parameters
@@ -167,6 +167,27 @@ export class IntParam extends Parameter {
     innerReact = (props: Dict): react.HTMLElement => parameterInput(props);
     getValue = (s: string): number => (s === '')? this.defaultValue() : parseInt(s, 10);
     defaultValue = (): number => 0;
+}
+
+// A parameter whose value is json
+export class JSONParam extends Parameter {
+    constructor(name: string, optional: boolean) {super(name, optional); }
+    getValue = (s: string) => {
+      try
+      {
+        return JSON.parse(s)
+      }
+      catch (Exception){
+        return ''
+      }
+    };
+    innerReact = (props: Dict): react.HTMLElement => {
+      // props['className'] = 'parameter-input'
+      // props['style'] = {'minHeight': '300px', 'width': '400px'}
+      props['rows'] = 50
+      return d.textarea(props)
+    };
+    defaultValue = () => {};
 }
 
 /* A parameter whose value is a float.
@@ -261,7 +282,7 @@ export class StructParam extends Parameter {
 }
 
 // Utilities for token flow
-const csrfTokenStorageName = 'Dropbox_API_state';
+const csrfTokenStorageName = 'csrftoken';
 const tokenStorageName = 'Dropbox_API_explorer_token';
 
 export const createCsrfToken = (): string => {
@@ -386,7 +407,7 @@ export const errorHandler = (stat: number, response: string): react.HTMLElement 
     );
 }
 
-    
+
 // Since HTTP headers cannot contain arbitrary Unicode characters, we must replace them.
 export const escapeUnicode = (s: string): string => s.replace(/[\u007f-\uffff]/g,
     (c: string) => '\\u'+('0000'+c.charCodeAt(0).toString(16)).slice(-4));
@@ -423,22 +444,20 @@ export class Highlight extends react.Component<HltProps, {}> {
 // The headers for an RPC-like endpoint HTTP request
 export const RPCLikeHeaders = (token: string): Dict => {
     return {
-        Authorization:  "Bearer " + token,
-        "Content-Type": "application/json"
+        Authorization:  "Token " + token,
+        "Content-Type": "application/json",
     };
 }
 // args may need to be modified by the client, so they're passed in as a string
 export const uploadLikeHeaders = (token: string, args: string): Dict => {
     return {
-        Authorization:     "Bearer " + token,
-        "Content-Type":    "application/octet-stream",
-        "Dropbox-API-Arg": escapeUnicode(args)
+        Authorization: "Token " + token
     };
 }
 export const downloadLikeHeaders = (token: string, args: string): Dict => {
     return {
-        Authorization:     "Bearer " + token,
-        "Dropbox-API-Arg": escapeUnicode(args)
+        Authorization: "Token " + token,
+        "Content-Type": "application/json",
     }
 };
 

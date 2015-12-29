@@ -24,13 +24,13 @@ const DownloadCallListener = (component: any, resp: XMLHttpRequest, path: string
             utils.errorHandler(resp.status, utils.arrayBufToString(resp.response))
         });
     } else {
-        const response: string = resp.getResponseHeader('dropbox-api-result');
+        const response: string = resp.getResponseHeader('rinocloud-api-result');
         component.setState({responseText: utils.prettyJson(response)});
 
-        const toDownload: Blob = new Blob([resp.response], {type: 'application/octet-stream'});
+        const toDownload: Blob = new Blob([resp.response], {type: 'multipart/form-data'});
         component.setState({
             downloadURL:      URL.createObjectURL(toDownload),
-            downloadFilename: path
+            downloadFilename: JSON.parse(response).name
         })
     }
 }
@@ -53,6 +53,10 @@ const initRequest = (endpt: utils.Endpoint, headers: utils.Dict,
     let request = new XMLHttpRequest();
     request.onload = (_: Event) => listener(component, request);
     request.open('POST', endpt.getURL(), true);
+    request.setRequestHeader('Access-Control-Allow-Headers','X-Requested-With,rinocloud-api-result')
+    request.setRequestHeader('X-Requested-With','XMLHttpRequest')
+    request.setRequestHeader('rinocloud-api-result','*')
+
     for (let key in headers) {
         request.setRequestHeader(key, headers[key]);
     }
@@ -91,19 +95,18 @@ export const APIWrapper = (data: string, endpt: utils.Endpoint, token: string,
             var request = initRequest(endpt, utils.uploadLikeHeaders(token, data),
                 listener_wrapper, component);
             if (file !== null) {
-                let reader = new FileReader();
-                reader.onload = () => request.send(reader.result);
-                reader.readAsArrayBuffer(file);
+                var formData = new FormData();
+                formData.append("file", file);
+                formData.append("json", data);
+                request.send(formData);
             } else {
                 request.send();
             }
             break;
         case utils.EndpointKind.Download:
-            var request = initRequest(endpt, utils.downloadLikeHeaders(token, data),
-                listener_wrapper, component);
-            // Binary files shouldn't be accessed as strings
-            request.responseType = 'arraybuffer';
-            request.send();
+            var win = window.open(endpt.getURL() + '?id=' + JSON.parse(data).id, '_blank');
+            win.focus();
+            endRequest(component)
             break;
     }
 }
