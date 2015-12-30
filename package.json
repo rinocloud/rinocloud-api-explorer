@@ -1,5 +1,5 @@
 {
-  "name": "dropbox-api-v2-explorer",
+  "name": "rinocloud-api-explorer",
   "private": true,
   "scripts": {
     "build": "gulp",

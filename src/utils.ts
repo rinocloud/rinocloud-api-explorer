@@ -14,7 +14,7 @@ import react = require('react');
 import hljs = require('highlight.js');
 import cookie = require('./cookie');
 
-export const host = 'localhost:8000'
+export const host = 'rinocloud-staging-pr-70.herokuapp.com'
 
 type MappingFn = (key: string, value: any, i: number) => react.ClassicElement<{}>;
 
@@ -106,7 +106,7 @@ export class Endpoint {
 
     getHostname = () => host + '/api/1/';
     getPathname = (): string => '' + this.ns + '/' + this.name;
-    getURL = (): string => 'http://' + this.getHostname() + this.getPathname() + '/';
+    getURL = (): string => 'https://' + this.getHostname() + this.getPathname() + '/';
 }
 
 /* A parameter to an API endpoint. This class is abstract, as different kinds of parameters

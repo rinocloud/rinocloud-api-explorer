@@ -47,7 +47,7 @@ class TokenInput extends react.Component<TokenInputProps, void> {
 
     // This function handles the initial part of the OAuth2 token flow for the user.
     retrieveAuth = () => {
-        var win = window.open('http://localhost:8000/api/1/users/token/', '_blank');
+        var win = window.open('https://'+utils.host+'/api/1/users/token/', '_blank');
         win.focus();
 
         const state = utils.getHashDict()['__ept__'] + '!' + utils.createCsrfToken();
@@ -61,7 +61,6 @@ class TokenInput extends react.Component<TokenInputProps, void> {
         for (let key in params) {
             urlWithParams += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]) + '&';
         }
-        // window.location.assign(urlWithParams);
     }
     public render() {
         return d.tr(null,
@@ -357,13 +356,13 @@ class RequestArea extends react.Component<RequestAreaProps, any> {
                     d.tr({hidden: !this.state.showCode},
                         tableText('Code'),
                         d.td(null,
-                            d.div({id: 'request-container'},
-                                ce(CodeArea, {
-                                    ept:       this.props.currEpt,
-                                    paramVals: this.flatten(),
-                                    __file__:  this.state.__file__,
-                                    token:     this.state.showToken? utils.getToken() : '<access-token>'
-                                })
+                            d.div({id: 'request-container'}
+                                // ce(CodeArea, {
+                                //     ept:       this.props.currEpt,
+                                //     paramVals: this.flatten(),
+                                //     __file__:  this.state.__file__,
+                                //     token:     this.state.showToken? utils.getToken() : '<access-token>'
+                                // })
                             )
                         )
                     )
