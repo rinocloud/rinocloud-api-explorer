@@ -360,8 +360,8 @@ var TokenInput = (function (_super) {
         };
         // This function handles the initial part of the OAuth2 token flow for the user.
         this.retrieveAuth = function () {
-            // var win = window.open('https://'+utils.host+'/api/1/users/token/', '_blank');
-            // win.focus();
+            var win = window.open('https://' + utils.host + '/api/1/users/token/', '_blank');
+            win.focus();
             var state = utils.getHashDict()['__ept__'] + '!' + utils.createCsrfToken();
             var params = {
                 response_type: 'token',
@@ -373,7 +373,7 @@ var TokenInput = (function (_super) {
             for (var key in params) {
                 urlWithParams += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]) + '&';
             }
-            window.location.assign(urlWithParams);
+            // window.location.assign(urlWithParams);
         };
     }
     TokenInput.prototype.render = function () {
