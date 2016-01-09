@@ -47,7 +47,7 @@ class TokenInput extends react.Component<TokenInputProps, void> {
 
     // This function handles the initial part of the OAuth2 token flow for the user.
     retrieveAuth = () => {
-        var win = window.open('https://'+utils.host+'/api/1/users/token/', '_blank');
+        var win = window.open(utils.host+'/api/1/users/token/', '_blank');
         win.focus();
 
         const state = utils.getHashDict()['__ept__'] + '!' + utils.createCsrfToken();
@@ -61,6 +61,7 @@ class TokenInput extends react.Component<TokenInputProps, void> {
         for (let key in params) {
             urlWithParams += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]) + '&';
         }
+        // window.location.assign(urlWithParams);
     }
     public render() {
         return d.tr(null,
@@ -422,8 +423,8 @@ class EndpointSelector extends react.Component<EndpointSelectorProps, void> {
             d.p({style: {marginLeft: '35px', marginTop: '12px'}},
                 d.a({onClick: () => window.location.href = developerPage},
                     d.img({
-                        src:       'https://s3-eu-west-1.amazonaws.com/rinocloud/static/logo.png',
-                        width:     100,
+                        src:       'https://s3-eu-west-1.amazonaws.com/rinocloud/static/rinocloudMain.svg',
+                        height:     20,
                         className: 'home-icon'
                     })
                 )
@@ -679,8 +680,11 @@ const main = (): void => {
     }
 
     const hashes = utils.getHashDict();
+
     if ('state' in hashes) { // completing token flow, and checking the state is OK
-        const state = checkCsrf(hashes['state'])
+
+        const state = hashes['state']
+        console.log(state)
         if (state === null) {
             window.location.hash = '#auth_error!';
         } else {

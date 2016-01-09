@@ -14,7 +14,8 @@ import react = require('react');
 import hljs = require('highlight.js');
 import cookie = require('./cookie');
 
-export const host = 'rinocloud-staging-pr-70.herokuapp.com'
+// export const host = 'https://rinocloud-staging-pr-70.herokuapp.com'
+export const host = 'http://localhost:8000'
 
 type MappingFn = (key: string, value: any, i: number) => react.ClassicElement<{}>;
 
@@ -106,7 +107,13 @@ export class Endpoint {
 
     getHostname = () => host + '/api/1/';
     getPathname = (): string => '' + this.ns + '/' + this.name;
-    getURL = (): string => 'https://' + this.getHostname() + this.getPathname() + '/';
+    getURL = (): string => {
+      let url = this.getHostname() + this.getPathname() + '/';
+      return url;
+    };
+
+
+
 }
 
 /* A parameter to an API endpoint. This class is abstract, as different kinds of parameters
@@ -165,7 +172,7 @@ export class TextParam extends Parameter {
 export class IntParam extends Parameter {
     constructor(name: string, optional: boolean) { super(name, optional);}
     innerReact = (props: Dict): react.HTMLElement => parameterInput(props);
-    getValue = (s: string): number => (s === '')? this.defaultValue() : parseInt(s, 10);
+    getValue = (s: string): number => (s === '') ? this.defaultValue() : parseInt(s, 10);
     defaultValue = (): number => 0;
 }
 

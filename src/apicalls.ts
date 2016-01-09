@@ -95,6 +95,7 @@ export const APIWrapper = (data: string, endpt: utils.Endpoint, token: string,
             var request = initRequest(endpt, utils.uploadLikeHeaders(token, data),
                 listener_wrapper, component);
             if (file !== null) {
+                console.log(file)
                 var formData = new FormData();
                 formData.append("file", file);
                 formData.append("json", data);
