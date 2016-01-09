@@ -81,6 +81,7 @@ exports.APIWrapper = function (data, endpt, token, listener, component, file) {
         case utils.EndpointKind.Upload:
             var request = initRequest(endpt, utils.uploadLikeHeaders(token, data), listener_wrapper, component);
             if (file !== null) {
+                console.log(file);
                 var formData = new FormData();
                 formData.append("file", file);
                 formData.append("json", data);
@@ -307,15 +308,17 @@ exports.getAll = function () {
 var Utils = require('./utils');
 var Endpoints;
 (function (Endpoints) {
-    var get = new Utils.Endpoint("files", "get", Utils.EndpointKind.RPCLike, new Utils.TextParam("id", false));
-    var children = new Utils.Endpoint("files", "children", Utils.EndpointKind.RPCLike, new Utils.TextParam("id", true));
-    var create = new Utils.Endpoint("files", "create", Utils.EndpointKind.RPCLike, new Utils.TextParam("name", false), new Utils.IntParam("parent", true), new Utils.JSONParam("json", true));
+    var get = new Utils.Endpoint("files", "get", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false));
+    var children = new Utils.Endpoint("files", "children", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", true), new Utils.IntParam("limit", true), new Utils.IntParam("offset", true));
+    var ancestors = new Utils.Endpoint("files", "ancestors", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", true));
+    var create = new Utils.Endpoint("files", "create_folder", Utils.EndpointKind.RPCLike, new Utils.TextParam("name", false), new Utils.IntParam("parent", true), new Utils.JSONParam("json", true));
     var upload = new Utils.Endpoint("files", "upload", Utils.EndpointKind.Upload, new Utils.FileParam(), new Utils.IntParam("parent", true), new Utils.JSONParam("json", true));
-    var update = new Utils.Endpoint("files", "update", Utils.EndpointKind.RPCLike, new Utils.TextParam("id", false), new Utils.JSONParam("json", true));
-    var download = new Utils.Endpoint("files", "download", Utils.EndpointKind.Download, new Utils.TextParam("id", false));
-    var del = new Utils.Endpoint("files", "delete", Utils.EndpointKind.RPCLike, new Utils.TextParam("id", false));
+    var update = new Utils.Endpoint("files", "update", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false), new Utils.JSONParam("json", true));
+    var download = new Utils.Endpoint("files", "download", Utils.EndpointKind.Download, new Utils.IntParam("id", false));
+    var del = new Utils.Endpoint("files", "delete", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false));
     Endpoints.endpointList = [get,
         children,
+        ancestors,
         create,
         upload,
         update,
@@ -360,7 +363,7 @@ var TokenInput = (function (_super) {
         };
         // This function handles the initial part of the OAuth2 token flow for the user.
         this.retrieveAuth = function () {
-            var win = window.open('https://' + utils.host + '/api/1/users/token/', '_blank');
+            var win = window.open(utils.host + '/api/1/users/token/', '_blank');
             win.focus();
             var state = utils.getHashDict()['__ept__'] + '!' + utils.createCsrfToken();
             var params = {
@@ -638,8 +641,8 @@ var EndpointSelector = (function (_super) {
             }
         });
         return d.div({ 'id': 'sidebar' }, d.p({ style: { marginLeft: '35px', marginTop: '12px' } }, d.a({ onClick: function () { return window.location.href = developerPage; } }, d.img({
-            src: 'https://s3-eu-west-1.amazonaws.com/rinocloud/static/logo.png',
-            width: 100,
+            src: 'https://s3-eu-west-1.amazonaws.com/rinocloud/static/rinocloudMain.svg',
+            height: 20,
             className: 'home-icon'
         }))), d.div({ id: 'endpoint-list' }, namespaces.sort().map(function (ns) {
             return d.div(null, d.li(null, ns), groups[ns].map(function (ept) {
@@ -848,7 +851,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 var react = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
 var hljs = (typeof window !== "undefined" ? window['hljs'] : typeof global !== "undefined" ? global['hljs'] : null);
 var cookie = require('./cookie');
-exports.host = 'rinocloud-staging-pr-70.herokuapp.com';
+// export const host = 'https://rinocloud-staging-pr-70.herokuapp.com'
+exports.host = 'http://localhost:8000';
 var ce = react.createElement;
 var d = react.DOM;
 // This class mostly exists to help Typescript type-check my programs.
@@ -936,7 +940,10 @@ var Endpoint = (function () {
         }
         this.getHostname = function () { return exports.host + '/api/1/'; };
         this.getPathname = function () { return '' + _this.ns + '/' + _this.name; };
-        this.getURL = function () { return 'https://' + _this.getHostname() + _this.getPathname() + '/'; };
+        this.getURL = function () {
+            var url = _this.getHostname() + _this.getPathname() + '/';
+            return url;
+        };
         this.ns = ns;
         this.name = name;
         this.kind = kind;
