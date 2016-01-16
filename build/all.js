@@ -305,25 +305,50 @@ exports.getAll = function () {
 };
 
 },{}],4:[function(require,module,exports){
+// POST      /create_folder/           new a folder like object
+// POST      /upload_multipart/        uploads a file
+// POST      /upload_binary/           uploads a file
+// POST      /update_metadata/         updates an object
+// POST      /get_metadata/            gets record of id
+// POST      /children/                gets children of current folder
+// POST      /ancestors/               gets parents of current file or folder
+// POST/GET  /download/                downloads a file
+// POST      /delete/                  deletes an object - will delete all children
+// POST      /delete_metadata_field/   deletes a field from an objects metadata
+// POST      /move/
+// POST      /copy/
+// POST      /search/
+// POST      /autocomplete/
 var Utils = require('./utils');
 var Endpoints;
 (function (Endpoints) {
-    var get = new Utils.Endpoint("files", "get", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false));
+    var create_folder = new Utils.Endpoint("files", "create_folder", Utils.EndpointKind.RPCLike, new Utils.TextParam("name", false), new Utils.IntParam("parent", true), new Utils.JSONParam("json", true));
+    var upload = new Utils.Endpoint("files", "upload_multipart", Utils.EndpointKind.Upload, new Utils.FileParam(), new Utils.IntParam("parent", true), new Utils.JSONParam("json", true));
+    var update = new Utils.Endpoint("files", "update_metadata", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false), new Utils.JSONParam("json", true));
+    var get = new Utils.Endpoint("files", "get_metadata", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false));
     var children = new Utils.Endpoint("files", "children", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", true), new Utils.IntParam("limit", true), new Utils.IntParam("offset", true));
     var ancestors = new Utils.Endpoint("files", "ancestors", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", true));
-    var create = new Utils.Endpoint("files", "create_folder", Utils.EndpointKind.RPCLike, new Utils.TextParam("name", false), new Utils.IntParam("parent", true), new Utils.JSONParam("json", true));
-    var upload = new Utils.Endpoint("files", "upload", Utils.EndpointKind.Upload, new Utils.FileParam(), new Utils.IntParam("parent", true), new Utils.JSONParam("json", true));
-    var update = new Utils.Endpoint("files", "update", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false), new Utils.JSONParam("json", true));
     var download = new Utils.Endpoint("files", "download", Utils.EndpointKind.Download, new Utils.IntParam("id", false));
     var del = new Utils.Endpoint("files", "delete", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false));
-    Endpoints.endpointList = [get,
-        children,
-        ancestors,
-        create,
+    var delete_metadata_field = new Utils.Endpoint("files", "delete_metadata_field", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false), new Utils.TextParam("field", false));
+    var move = new Utils.Endpoint("files", "move", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false));
+    var copy = new Utils.Endpoint("files", "copy", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false));
+    var search = new Utils.Endpoint("files", "search", Utils.EndpointKind.RPCLike, new Utils.TextParam("query", false));
+    var autocomplete = new Utils.Endpoint("files", "autocomplete", Utils.EndpointKind.RPCLike, new Utils.IntParam("id", false));
+    Endpoints.endpointList = [create_folder,
         upload,
         update,
+        get,
+        children,
+        ancestors,
         download,
-        del];
+        del,
+        delete_metadata_field,
+        move,
+        copy,
+        search,
+        autocomplete,
+    ];
 })(Endpoints || (Endpoints = {}));
 module.exports = Endpoints;
 
@@ -851,8 +876,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var react = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
 var hljs = (typeof window !== "undefined" ? window['hljs'] : typeof global !== "undefined" ? global['hljs'] : null);
 var cookie = require('./cookie');
-// export const host = 'https://rinocloud-staging-pr-70.herokuapp.com'
-exports.host = 'http://localhost:8000';
+exports.host = 'https://rinocloud-staging-pr-70.herokuapp.com';
 var ce = react.createElement;
 var d = react.DOM;
 // This class mostly exists to help Typescript type-check my programs.

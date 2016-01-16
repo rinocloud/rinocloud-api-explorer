@@ -14,8 +14,8 @@ import react = require('react');
 import hljs = require('highlight.js');
 import cookie = require('./cookie');
 
-// export const host = 'https://rinocloud-staging-pr-70.herokuapp.com'
-export const host = 'http://localhost:8000'
+export const host = 'https://rinocloud-staging-pr-70.herokuapp.com'
+// export const host = 'http://localhost:8000'
 
 type MappingFn = (key: string, value: any, i: number) => react.ClassicElement<{}>;
 
