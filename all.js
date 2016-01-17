@@ -388,7 +388,7 @@ var TokenInput = (function (_super) {
         };
         // This function handles the initial part of the OAuth2 token flow for the user.
         this.retrieveAuth = function () {
-            var win = window.open(utils.host + '/api/1/users/token/', '_blank');
+            var win = window.open(utils.host + '/integrations/', '_blank');
             win.focus();
             var state = utils.getHashDict()['__ept__'] + '!' + utils.createCsrfToken();
             var params = {
@@ -876,7 +876,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var react = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
 var hljs = (typeof window !== "undefined" ? window['hljs'] : typeof global !== "undefined" ? global['hljs'] : null);
 var cookie = require('./cookie');
-exports.host = 'https://rinocloud-staging-pr-70.herokuapp.com';
+exports.host = 'https://rinocloud.com';
 var ce = react.createElement;
 var d = react.DOM;
 // This class mostly exists to help Typescript type-check my programs.
