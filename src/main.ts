@@ -47,7 +47,7 @@ class TokenInput extends react.Component<TokenInputProps, void> {
 
     // This function handles the initial part of the OAuth2 token flow for the user.
     retrieveAuth = () => {
-        var win = window.open(utils.host+'/api/1/users/token/', '_blank');
+        var win = window.open(utils.host+'/integrations/', '_blank');
         win.focus();
 
         const state = utils.getHashDict()['__ept__'] + '!' + utils.createCsrfToken();
