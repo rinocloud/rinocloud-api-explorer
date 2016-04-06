@@ -22,7 +22,7 @@ interface FileElement extends HTMLElement {
 const ce = react.createElement;
 const  d = react.DOM;
 
-const developerPage = 'https://www.rinocloud.com/documentation';
+const developerPage = 'https://github.com/rinocloud/rinocloud-api-explorer';
 
 /* Element for text field in page table.
  */
@@ -72,14 +72,9 @@ class TokenInput extends react.Component<TokenInputProps, void> {
                     id:           'token-input',
                     defaultValue: utils.getToken(),
                     onChange:     this.handleEdit,
-                    placeholder: 'If you don\'t have an access token, click the "Get Token" button to obtain one.'
+                    placeholder: 'Paste your token here.'
                 }),
-                d.div({className: 'align-right'},
-                    d.button({onClick: this.retrieveAuth}, 'Get Token'),
-                    d.button({onClick: this.props.toggleShow},
-                        this.props.showToken? 'Hide Token' : 'Show Token'
-                    )
-                )
+                d.p({style: {'marginTop': '10px'}}, 'Go to your Rinocloud project to get your token.')
             )
         );
     }
@@ -259,17 +254,17 @@ class RequestArea extends react.Component<RequestAreaProps, any> {
 
     componentDidMount = () => {
       let ta = document.getElementsByTagName("textarea")[0]
-      var cm = CodeMirror.fromTextArea(ta, {lineNumbers: true, mode: "javascript"})
-      cm.on('change', function(){
-        cm.save()
-        const v = cm.getDoc().getValue();
-        try{
-          this.updateParamValues('json', JSON.parse(v))
-        }
-        catch (Exception){
-          return ''
-        }
-      }.bind(this))
+      // var cm = CodeMirror.fromTextArea(ta, {lineNumbers: true, mode: "javascript"})
+      // cm.on('change', function(){
+      //   cm.save()
+      //   const v = cm.getDoc().getValue();
+      //   try{
+      //     this.updateParamValues('json', JSON.parse(v))
+      //   }
+      //   catch (Exception){
+      //     return ''
+      //   }
+      // }.bind(this))
     }
 
     stringify = () => {
@@ -329,11 +324,11 @@ class RequestArea extends react.Component<RequestAreaProps, any> {
                     d.tr(null,
                         tableText('Request'),
                         d.td(null,
-                            d.div({className: 'align-right'},
-                                d.a({href: documentation},
-                                    'Documentation'
-                                )
-                            ),
+                            // d.div({className: 'align-right'},
+                            //     d.a({href: documentation},
+                            //         'Documentation'
+                            //     )
+                            // ),
                             d.table({id: 'parameter-list'},
                                 this.props.currEpt.params.map((param: utils.Parameter) =>
                                     ce(paramClassChooser(param), {
@@ -343,7 +338,6 @@ class RequestArea extends react.Component<RequestAreaProps, any> {
                                     }))
                             ),
                             d.div(null,
-                                d.button({onClick: this.showOrHideCode}, this.state.showCode ? 'Hide Code' : 'Show Code'),
                                 d.button({onClick: this.submit, disabled: this.props.inProgress}, 'Submit Call'),
                                 d.img({
                                     src: 'https://www.dropbox.com/static/images/icons/ajax-loading-small.gif',
@@ -421,10 +415,11 @@ class EndpointSelector extends react.Component<EndpointSelectorProps, void> {
 
         return d.div({'id': 'sidebar'},
             d.p({style: {marginLeft: '35px', marginTop: '12px'}},
-                d.a({onClick: () => window.location.href = developerPage},
+                d.a({onClick: () => window.location.href = '/'},
                     d.img({
-                        src:       'https://s3-eu-west-1.amazonaws.com/rinocloud/static/rinocloudMain.svg',
-                        height:     20,
+                        // src:       'https://s3-eu-west-1.amazonaws.com/rinocloud/static/rinocloudMain.svg',
+                        src: 'https://s3-eu-west-1.amazonaws.com/rinocloud/static/Rreverse.png',
+                        height:     50,
                         className: 'home-icon'
                     })
                 )
@@ -591,14 +586,8 @@ const introPage: react.ReactElement<TextPageProps> = ce(TextPage, {
             d.span(null,
                 d.p(null, 'Welcome to the Rinocloud API Explorer!'),
                 d.p(null,
-                    'This API Explorer is a tool to help you learn about the ',
-                    d.a({href: developerPage}, 'Rinocloud API v2'),
-                    " and test your own examples. For each endpoint, you'll be able to submit an API call ",
-                    'with your own parameters and see the code for that call, as well as the API response.'
-                ),
-                d.p(null,
                     'Click on an endpoint on your left to get started, or check out ',
-                    d.a({href: developerPage + '/documentation'},
+                    d.a({href: developerPage},
                         'the documentation'),
                     ' for more information on the API.'
                 )
