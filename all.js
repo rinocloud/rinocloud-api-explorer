@@ -373,7 +373,7 @@ var apicalls = require('./apicalls');
 var codeview = require('./codeview');
 var ce = react.createElement;
 var d = react.DOM;
-var developerPage = 'https://www.rinocloud.com/documentation';
+var developerPage = 'https://github.com/rinocloud/rinocloud-api-explorer';
 /* Element for text field in page table.
  */
 var tableText = function (text) {
@@ -410,8 +410,8 @@ var TokenInput = (function (_super) {
             id: 'token-input',
             defaultValue: utils.getToken(),
             onChange: this.handleEdit,
-            placeholder: 'If you don\'t have an access token, click the "Get Token" button to obtain one.'
-        }), d.div({ className: 'align-right' }, d.button({ onClick: this.retrieveAuth }, 'Get Token'), d.button({ onClick: this.props.toggleShow }, this.props.showToken ? 'Hide Token' : 'Show Token'))));
+            placeholder: 'Paste your token here.'
+        }), d.p({ style: { 'marginTop': '10px' } }, 'Go to your Rinocloud project to get your token.')));
     };
     return TokenInput;
 })(react.Component);
@@ -553,17 +553,17 @@ var RequestArea = (function (_super) {
         };
         this.componentDidMount = function () {
             var ta = document.getElementsByTagName("textarea")[0];
-            var cm = CodeMirror.fromTextArea(ta, { lineNumbers: true, mode: "javascript" });
-            cm.on('change', function () {
-                cm.save();
-                var v = cm.getDoc().getValue();
-                try {
-                    this.updateParamValues('json', JSON.parse(v));
-                }
-                catch (Exception) {
-                    return '';
-                }
-            }.bind(_this));
+            // var cm = CodeMirror.fromTextArea(ta, {lineNumbers: true, mode: "javascript"})
+            // cm.on('change', function(){
+            //   cm.save()
+            //   const v = cm.getDoc().getValue();
+            //   try{
+            //     this.updateParamValues('json', JSON.parse(v))
+            //   }
+            //   catch (Exception){
+            //     return ''
+            //   }
+            // }.bind(this))
         };
         this.stringify = function () {
             return JSON.stringify(_this.flatten());
@@ -618,13 +618,19 @@ var RequestArea = (function (_super) {
         return d.span({ id: 'request-area' }, d.table({ className: 'page-table' }, d.tbody(null, ce(TokenInput, {
             toggleShow: this.showOrHide,
             showToken: this.state.showToken
-        }), d.tr(null, tableText('Request'), d.td(null, d.div({ className: 'align-right' }, d.a({ href: documentation }, 'Documentation')), d.table({ id: 'parameter-list' }, this.props.currEpt.params.map(function (param) {
+        }), d.tr(null, tableText('Request'), d.td(null, 
+        // d.div({className: 'align-right'},
+        //     d.a({href: documentation},
+        //         'Documentation'
+        //     )
+        // ),
+        d.table({ id: 'parameter-list' }, this.props.currEpt.params.map(function (param) {
             return ce(paramClassChooser(param), {
                 key: _this.props.currEpt.name + param.name,
                 onChange: _this.updateParamValues,
                 param: param
             });
-        })), d.div(null, d.button({ onClick: this.showOrHideCode }, this.state.showCode ? 'Hide Code' : 'Show Code'), d.button({ onClick: this.submit, disabled: this.props.inProgress }, 'Submit Call'), d.img({
+        })), d.div(null, d.button({ onClick: this.submit, disabled: this.props.inProgress }, 'Submit Call'), d.img({
             src: 'https://www.dropbox.com/static/images/icons/ajax-loading-small.gif',
             hidden: !this.props.inProgress,
             style: { position: 'relative', top: '2px', left: '10px' }
@@ -665,9 +671,10 @@ var EndpointSelector = (function (_super) {
                 groups[ept.ns].push(ept);
             }
         });
-        return d.div({ 'id': 'sidebar' }, d.p({ style: { marginLeft: '35px', marginTop: '12px' } }, d.a({ onClick: function () { return window.location.href = developerPage; } }, d.img({
-            src: 'https://s3-eu-west-1.amazonaws.com/rinocloud/static/rinocloudMain.svg',
-            height: 20,
+        return d.div({ 'id': 'sidebar' }, d.p({ style: { marginLeft: '35px', marginTop: '12px' } }, d.a({ onClick: function () { return window.location.href = '/'; } }, d.img({
+            // src:       'https://s3-eu-west-1.amazonaws.com/rinocloud/static/rinocloudMain.svg',
+            src: 'https://s3-eu-west-1.amazonaws.com/rinocloud/static/Rreverse.png',
+            height: 50,
             className: 'home-icon'
         }))), d.div({ id: 'endpoint-list' }, namespaces.sort().map(function (ns) {
             return d.div(null, d.li(null, ns), groups[ns].map(function (ept) {
@@ -773,7 +780,7 @@ var TextPage = (function (_super) {
 })(react.Component);
 // Introductory page, which people see when they first open the webpage
 var introPage = ce(TextPage, {
-    message: d.span(null, d.p(null, 'Welcome to the Rinocloud API Explorer!'), d.p(null, 'This API Explorer is a tool to help you learn about the ', d.a({ href: developerPage }, 'Rinocloud API v2'), " and test your own examples. For each endpoint, you'll be able to submit an API call ", 'with your own parameters and see the code for that call, as well as the API response.'), d.p(null, 'Click on an endpoint on your left to get started, or check out ', d.a({ href: developerPage + '/documentation' }, 'the documentation'), ' for more information on the API.')) });
+    message: d.span(null, d.p(null, 'Welcome to the Rinocloud API Explorer!'), d.p(null, 'Click on an endpoint on your left to get started, or check out ', d.a({ href: developerPage }, 'the documentation'), ' for more information on the API.')) });
 /* The endpoint name (supplied via the URL's hash) doesn't correspond to any actual endpoint. Right
    now, this can only happen if the user edits the URL hash.
    React sanitizes its inputs, so displaying the hash below is safe.
